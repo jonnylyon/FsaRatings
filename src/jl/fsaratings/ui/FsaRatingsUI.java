@@ -1,64 +1,70 @@
 package jl.fsaratings.ui;
 
-import java.awt.Choice;
-import java.awt.Dimension;
 import java.awt.event.ItemListener;
 import java.util.Map;
 import java.util.Set;
 
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
+/**
+ * UI interface, provided to allow easy mocking for test purposes.
+ * @author jonny.lyon
+ *
+ */
+public interface FsaRatingsUI {
 
-public class FsaRatingsUI extends JFrame {
+	/**
+	 * Populates the dropdown list with the authority options
+	 *
+	 * @param authorities A set of authority names
+	 */
+	void populateAuthoritiesList(Set<String> authorities);
 
-	private Choice authoritiesChoice;
-	private JLabel resultsLabel;
+	/**
+	 * Adds an item listener to listen for changes to the dropdown
+	 *
+	 * @param listener A suitable listener, implementing the ItemListener interface
+	 */
+	void addItemListener(ItemListener listener);
 
-	public FsaRatingsUI(Set<String> authorities) {
-		JPanel panel = new JPanel();
+	/**
+	 * Gets the name of the selected authority from the dropdown
+	 *
+	 * @return the name of the selected authority
+	 */
+	String getSelectedAuthorityName();
 
-		resultsLabel = new JLabel("Please select an authority to begin");
+	/**
+	 * Takes the results, formats them and displays them in the results
+	 * section of the UI
+	 *
+	 * @param results A map from rating type to percentage
+	 */
+	void displayResults(Map<String, Double> results);
 
-		resultsLabel.setPreferredSize(new Dimension(0,400));
-		resultsLabel.setVerticalAlignment(SwingConstants.TOP);
+	/**
+	 * Replaces the current contents of the results section with a messsage
+	 * informing the user of an error retrieving the results
+	 *
+	 * @param authority the authority that was being retrieved when the error occurred
+	 */
+	void displayResultError(String authority);
 
-		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		authoritiesChoice = new Choice();
-		authoritiesChoice.add("Please select an authority");
-		authorities.forEach(a -> authoritiesChoice.add(a));
-		panel.add(authoritiesChoice);
+	/**
+	 * Replaces the current contents of the results section with a message
+	 * informing the user that no 'wanted' results are available for the selected
+	 * authority
+	 *
+	 * @param authority the authority for which no results are available
+	 */
+	void displayNoResultsMessage(String authority);
 
-		panel.add(new JScrollPane(resultsLabel));
-		this.add(panel);
-		this.pack();
-		this.setVisible(true);
-	}
+	/**
+	 * Removes the current contents of the results section
+	 */
+	void clearResultMessage();
 
-	public void addItemListener(ItemListener listener) {
-		authoritiesChoice.addItemListener(listener);
-	}
-
-	public String getSelectedAuthorityName() {
-		return authoritiesChoice.getSelectedItem();
-	}
-
-	public void showLoadingText() {
-		resultsLabel.setText("Currently loading data...");
-	}
-
-	public void displayResults(Map<String, Double> results) {
-		String resultsHtml = "<html><table><tr><th>Rating</th><th>Percentage</th></tr>";
-
-		for (String key : results.keySet()) {
-			resultsHtml += "<tr><td>"+key+"</td><td>"+String.format("%.2f%%", results.get(key))+"</td></tr>";
-		}
-
-		resultsHtml += "</table></html>";
-
-		resultsLabel.setText(resultsHtml);
-	}
+	/**
+	 * Displays a dialog informing the user of an error loading the list of available
+	 * authorities
+	 */
+	void notifyErrorLoadingAuthorities();
 }
